@@ -36,6 +36,7 @@ const Navbar = () => {
                 );
 
                 const profile = userdata.data.data.userprofile;
+                console.log(userdata)
                 setuser(profile.username);
             } catch (error) {
                 console.log("User not logged in");
