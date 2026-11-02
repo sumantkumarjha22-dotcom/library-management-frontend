@@ -23,7 +23,7 @@ const [answer, setanswer] = useState("")
  }
   const handelsearch = async ()=>{
      try {
-      const sendquestion = await axios.post("http://localhost:5000/api/v1/users/ask",
+      const sendquestion = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/users/ask`,
        {question},
                   
        

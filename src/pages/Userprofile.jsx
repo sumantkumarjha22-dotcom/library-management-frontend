@@ -8,13 +8,13 @@ const Userprofile = () => {
     username: "",
   })
 
-console.log("hell0")
+console.log("helliiiii0")
 
 
   useEffect(() => {
     const getuserdetails = async () => {
      try {
-       const userdata = await axios.get("http://localhost:5000/api/v1/users/detail", {
+       const userdata = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/users/detail`, {
          withCredentials: true
        })
        const profile = userdata.data.data.userdetails
@@ -39,15 +39,17 @@ const [collected, setcollected] = useState([])
 
     const getbookcollection = async () => {
       try {
-        //console.log("hello")
+        console.log("helloooooooo")
 
-        const collection = await axios.get("http://localhost:5000/api/v1/users/giveusercollectrequest", {
+        const collection = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/users/giveusercollectrequest`, {
           withCredentials: true
         })
-        // console.log(2)
+         console.log("2")
        console.log( "collection",collection.data.data.findcollectedbook)
        
         setcollected(collection.data.data.findcollectedbook)
+
+        console.log(collection)
 
         
       }
@@ -56,6 +58,7 @@ const [collected, setcollected] = useState([])
 
       catch (error) {
         console.log("in getbookcollection")
+        
       }
 
 
@@ -66,85 +69,123 @@ const [collected, setcollected] = useState([])
 
 
 return (
-     <div className="overflow-x-auto">
-             <table className="w-full">
+  <div className="w-full min-h-screen bg-gray-100">
+    <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
 
-              <thead className="bg-gray-50">
-            
-                <tr>
-                  <th className="text-left p-4">
-                    BookName
-                  </th>
+      {/* Profile Card */}
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-md p-4 sm:p-6 flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+        <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-full bg-indigo-600 text-white flex items-center justify-center text-3xl sm:text-4xl font-bold uppercase">
+          {userdetail.fullname?.charAt(0) || "?"}
+        </div>
 
-                  <th className="text-left p-4">
-                    BookId
-                  </th>
-                  {/* <th className="text-left p-4">
-                    uaername
-                  </th> */}
+        <div className="min-w-0 text-center sm:text-left">
+          <h1 className="text-xl sm:text-3xl font-bold text-slate-800 break-words">
+            {userdetail.fullname}
+          </h1>
+          <p className="mt-1 text-sm sm:text-base text-slate-500 break-all">
+            @{userdetail.username}
+          </p>
+          <p className="mt-1 text-sm sm:text-base text-slate-600 break-all">
+            {userdetail.email}
+          </p>
+        </div>
+      </div>
 
-                  {/* <th className="text-left p-4">
-                    userid
-                  </th> */}
-                  <th className="text-left p-4">
-                    collectdate
-                  </th>
-  
-                    <th className="text-left p-4">
-                    sumbitdate
-                  </th>
-                 
-                  <th className="text-left p-4">
-                    status
-                  </th>
-                </tr>
+      {/* Collected Books */}
+      <h2 className="mt-8 mb-4 text-lg sm:text-2xl font-bold text-slate-800">
+        My Collected Books
+      </h2>
 
-              </thead>
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-md overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px]">
 
-     
-{collected.map((book)=>{
+            <thead className="bg-gray-50">
 
-          return     <tbody>
-          
-                <tr key={book.BookId} className="border-t">
+              <tr>
+                <th className="text-left p-3 sm:p-4 text-xs sm:text-sm font-semibold uppercase tracking-wide text-slate-600">
+                  BookName
+                </th>
 
-                  <td className="p-4">
-                    {book.BookName}
-                  </td>
+                <th className="text-left p-3 sm:p-4 text-xs sm:text-sm font-semibold uppercase tracking-wide text-slate-600">
+                  BookId
+                </th>
+                {/* <th className="text-left p-4">
+                  uaername
+                </th> */}
 
-                  <td className="p-4">
-                    {book.BookId}
-                  </td>
+                {/* <th className="text-left p-4">
+                  userid
+                </th> */}
+                <th className="text-left p-3 sm:p-4 text-xs sm:text-sm font-semibold uppercase tracking-wide text-slate-600">
+                  collectdate
+                </th>
 
-                  {/* <td className="p-4">
-                    {book.UserName}
-                  </td> */}
-                  {/* <td className="p-4">
-                    {book.UserId}
-                  </td> */}
+                <th className="text-left p-3 sm:p-4 text-xs sm:text-sm font-semibold uppercase tracking-wide text-slate-600">
+                  sumbitdate
+                </th>
 
-                  <td className="p-4">
-                   
-  <button className="text-blue-600 mr-4">
-    {book.Status}
-  </button>
+                <th className="text-left p-3 sm:p-4 text-xs sm:text-sm font-semibold uppercase tracking-wide text-slate-600">
+                  status
+                </th>
+              </tr>
 
-  
+            </thead>
 
-                  
-                  </td>
+            <tbody>
+              {collected.map((book)=>{
 
-                </tr>
-              
+                return (
+                  <tr key={book.BookId} className="border-t border-gray-100 hover:bg-gray-50 transition-colors">
 
-              </tbody>
-})}
+                    <td className="p-3 sm:p-4 text-sm sm:text-base font-medium text-slate-800">
+                      {book.BookName}
+                    </td>
 
-            </table>
-        
-          </div>
+                    <td className="p-3 sm:p-4 text-sm sm:text-base text-slate-500 break-all">
+                      {book.BookId}
+                    </td>
 
-        
+                    {/* <td className="p-4">
+                      {book.UserName}
+                    </td> */}
+                    {/* <td className="p-4">
+                      {book.UserId}
+                    </td> */}
+
+                    {/* TODO: replace "—" with your real date fields */}
+                    <td className="p-3 sm:p-4 text-sm sm:text-base text-slate-400">
+                      —
+                    </td>
+
+                    <td className="p-3 sm:p-4 text-sm sm:text-base text-slate-400">
+                      —
+                    </td>
+
+                    <td className="p-3 sm:p-4">
+                      <button className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs sm:text-sm font-semibold cursor-default">
+                        {book.Status}
+                      </button>
+                    </td>
+
+                  </tr>
+                )
+              })}
+            </tbody>
+
+          </table>
+        </div>
+
+        {/* Empty State */}
+        {collected.length === 0 && (
+          <p className="text-center text-slate-500 text-sm sm:text-base py-10">
+            You haven't collected any books yet.
+          </p>
+        )}
+      </div>
+
+    </div>
+  </div>
 );
 
 }

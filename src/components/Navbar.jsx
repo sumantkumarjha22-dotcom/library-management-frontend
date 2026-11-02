@@ -1,146 +1,370 @@
-import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { CgProfile } from "react-icons/cg";
-import { FaSearch } from "react-icons/fa";
-import { FaUser } from "react-icons/fa";
 
-import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
-//import { Query } from 'mongoose';
-
-  
-
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaSearch, FaUser, FaBars, FaTimes } from "react-icons/fa";
+import axios from "axios";
 
 const Navbar = () => {
-  const navigate = useNavigate()
-   const [search, setsearch] = useState("")
-   const handelsearch = (e)=>{
-     setsearch(e.target.value)
+    const navigate = useNavigate();
 
-   }
+    const [search, setsearch] = useState("");
+    const [user, setuser] = useState("");
+    const [menuOpen, setMenuOpen] = useState(false);
 
- const handelsearchbutton = ()=>{
-  navigate("/search",{
-    state:{
-      query:search
-    }
-  })
-   
- }
+    const handelsearch = (e) => {
+        setsearch(e.target.value);
+    };
 
- 
+    const handelsearchbutton = () => {
+        navigate("/search", {
+            state: {
+                query: search,
+            },
+        });
 
-  const [user, setuser] = useState("")
+        setMenuOpen(false);
+    };
 
-  useEffect(() => {
-    
-    const getuserdetail = async () => {
-     // console.log(" i am in nabvbar")
-      const userdata = await axios.get("http://localhost:5000/api/v1/users/pofile",
-        {
-          withCredentials: true
+    useEffect(() => {
+        const getuserdetail = async () => {
+            try {
+                const userdata = await axios.get(
+                    `${import.meta.env.VITE_API_URL}/api/v1/users/pofile`,
+                    {
+                        withCredentials: true,
+                    }
+                );
+
+                const profile = userdata.data.data.userprofile;
+                setuser(profile.username);
+            } catch (error) {
+                console.log("User not logged in");
+                setuser("");
+            }
+        };
+
+        getuserdetail();
+    }, []);
+
+    const logouthadeler = async () => {
+        try {
+            await axios.post(
+               `${import.meta.env.VITE_API_URL}/api/v1/users/logout`,
+                {},
+                {
+                    withCredentials: true,
+                }
+            );
+
+            window.location.reload();
+        } catch (error) {
+            console.log("Logout error:", error.message);
         }
+    };
 
-      )
+    return (
+        <nav className="sticky top-0 z-50 bg-slate-300 shadow-md">
 
-      const profile = userdata.data.data.userprofile;
-      setuser(profile.username);
+            {/* ================= TOP NAVBAR ================= */}
+            <div className="flex items-center justify-between px-4 py-3">
 
+                {/* Logo */}
+                <div className="font-bold text-2xl sm:text-3xl lg:text-4xl">
+                    <button
+                        onClick={() => navigate("/home")}
+                    >
+                        bookApp
+                    </button>
+                </div>
 
-    }
-    getuserdetail()
+                {/* ================= DESKTOP SEARCH ================= */}
+                <div className="hidden md:flex items-center flex-1 max-w-xl mx-6">
 
-  }, [])
+                    <input
+                        type="text"
+                        placeholder="Search for books"
+                        value={search}
+                        onChange={handelsearch}
+                        className="
+                            w-full
+                            rounded-l-lg
+                            border
+                            border-slate-300
+                            bg-white
+                            px-4
+                            py-2
+                            outline-none
+                            focus:border-blue-500
+                        "
+                    />
 
+                    <button
+                        onClick={handelsearchbutton}
+                        className="
+                            flex
+                            items-center
+                            gap-2
+                            rounded-r-lg
+                            bg-blue-600
+                            px-4
+                            py-2
+                            font-medium
+                            text-white
+                            hover:bg-blue-700
+                        "
+                    >
+                        <FaSearch />
+                        Search
+                    </button>
+                </div>
 
-  const logouthadeler = async () => {
-    const response = await axios.post(
-      "http://localhost:5000/api/v1/users/logout",
-      {},
-      {
-        withCredentials: true
-      }
+                {/* ================= DESKTOP MENU ================= */}
+                <ul className="
+                    hidden
+                    md:flex
+                    items-center
+                    gap-3
+                    lg:gap-5
+                    text-lg
+                    lg:text-xl
+                    text-white
+                ">
+
+                    {/* AI Help */}
+                    <li>
+                        <button
+                            className="p-2 hover:font-bold transition"
+                            onClick={() => navigate("/ai")}
+                        >
+                            AI Help
+                        </button>
+                    </li>
+
+                    {/* User */}
+                    {user && (
+                        <li>
+                            <button
+                                className="
+                                    flex
+                                    items-center
+                                    gap-2
+                                    p-2
+                                    hover:font-bold
+                                    transition
+                                "
+                                onClick={() => navigate("/userprofile")}
+                            >
+                                <FaUser />
+
+                                <span className="max-w-32 truncate">
+                                    {user}
+                                </span>
+                            </button>
+                        </li>
+                    )}
+
+                    {/* Login + Signup */}
+                    {!user && (
+                        <>
+                            <li className="p-2 hover:font-bold">
+                                <Link to="/login">
+                                    Login
+                                </Link>
+                            </li>
+
+                            <li className="p-2 hover:font-bold">
+                                <Link to="/signup">
+                                    Signup
+                                </Link>
+                            </li>
+                        </>
+                    )}
+
+                    {/* Logout */}
+                    {user && (
+                        <li>
+                            <button
+                                className="p-2 hover:font-bold transition"
+                                onClick={logouthadeler}
+                            >
+                                Logout
+                            </button>
+                        </li>
+                    )}
+                </ul>
+
+                {/* ================= MOBILE MENU BUTTON ================= */}
+                <button
+                    className="md:hidden text-2xl text-slate-800"
+                    onClick={() => setMenuOpen(!menuOpen)}
+                >
+                    {menuOpen ? <FaTimes /> : <FaBars />}
+                </button>
+
+            </div>
+
+            {/* ================= MOBILE SEARCH ================= */}
+            <div className="md:hidden px-4 pb-3">
+
+                <div className="flex">
+
+                    <input
+                        type="text"
+                        placeholder="Search for books"
+                        value={search}
+                        onChange={handelsearch}
+                        className="
+                            min-w-0
+                            flex-1
+                            rounded-l-lg
+                            border
+                            border-slate-300
+                            bg-white
+                            px-3
+                            py-2
+                            text-sm
+                            outline-none
+                            focus:border-blue-500
+                        "
+                    />
+
+                    <button
+                        onClick={handelsearchbutton}
+                        className="
+                            flex
+                            items-center
+                            justify-center
+                            gap-2
+                            rounded-r-lg
+                            bg-blue-600
+                            px-4
+                            py-2
+                            text-sm
+                            font-medium
+                            text-white
+                            hover:bg-blue-700
+                        "
+                    >
+                        <FaSearch />
+                        Search
+                    </button>
+
+                </div>
+
+            </div>
+
+            {/* ================= MOBILE MENU ================= */}
+            {menuOpen && (
+                <div className="
+                    md:hidden
+                    border-t
+                    border-slate-400
+                    bg-slate-300
+                    px-4
+                    pb-4
+                ">
+
+                    <div className="
+                        flex
+                        flex-col
+                        gap-2
+                        text-lg
+                        text-white
+                    ">
+
+                        {/* AI Help */}
+                        <button
+                            className="
+                                rounded-lg
+                                p-3
+                                text-left
+                                hover:bg-slate-400
+                            "
+                            onClick={() => {
+                                navigate("/ai");
+                                setMenuOpen(false);
+                            }}
+                        >
+                            AI Help
+                        </button>
+
+                        {/* User Profile */}
+                        {user && (
+                            <button
+                                className="
+                                    flex
+                                    items-center
+                                    gap-2
+                                    rounded-lg
+                                    p-3
+                                    text-left
+                                    hover:bg-slate-400
+                                "
+                                onClick={() => {
+                                    navigate("/userprofile");
+                                    setMenuOpen(false);
+                                }}
+                            >
+                                <FaUser />
+                                {user}
+                            </button>
+                        )}
+
+                        {/* Login */}
+                        {!user && (
+                            <Link
+                                to="/login"
+                                className="
+                                    rounded-lg
+                                    p-3
+                                    hover:bg-slate-400
+                                "
+                                onClick={() => setMenuOpen(false)}
+                            >
+                                Login
+                            </Link>
+                        )}
+
+                        {/* Signup */}
+                        {!user && (
+                            <Link
+                                to="/signup"
+                                className="
+                                    rounded-lg
+                                    p-3
+                                    hover:bg-slate-400
+                                "
+                                onClick={() => setMenuOpen(false)}
+                            >
+                                Signup
+                            </Link>
+                        )}
+
+                        {/* Logout */}
+                        {user && (
+                            <button
+                                className="
+                                    rounded-lg
+                                    p-3
+                                    text-left
+                                    hover:bg-slate-400
+                                "
+                                onClick={() => {
+                                    logouthadeler();
+                                    setMenuOpen(false);
+                                }}
+                            >
+                                Logout
+                            </button>
+                        )}
+
+                    </div>
+                </div>
+            )}
+
+        </nav>
     );
-    window.location.reload();
+};
 
-  }
+export default Navbar;
 
-
-  return (
-    <>
-
-<nav className='flex bg-slate-300 justify-between sticky top-0 z-50 shadow-md'>
-
-      <div className='font-bold text-4xl pt-2 pl-3'>
-        <button onClick={()=>{navigate("/home")}}>
-          bookApp
-        </button>
-      </div>
-      <div className='mt-3 flex'>
-           <input
-              type="text"
-              placeholder="search for books"
-              value={search}
-              id='search'
-              onChange={handelsearch}
-              className="rounded-lg border border-slate-300 bg-white px-4 py-2 outline-none focus:border-blue-500"
-            />
-
-            <button onClick={handelsearchbutton}
-              
-                className=" flex items-center gap-2 rounded-lg text-2xl bg-blue-600 px-5 py-3  font-medium text-white hover:bg-blue-700"
-            >
-                <FaSearch />
-               searchd
-              
-            </button> </div>
-
-      <ul className=' flex items-center  gap-6 h-18 mx-9 text-2xl text-white justify-center pl-4'>
-
-        {/* Username */}
-         <li  className=' flex cursor-pointer p-3 hover:font-black'>
-            <button  className='flex items-center gap-2 '  onClick={() => navigate("/ai")}>
-             Al Help
-                  
-            </button>
-          </li>
-        {user && (
-          <li  className=' flex cursor-pointer p-3 hover:font-black'>
-            <button  className='flex items-center gap-2 '  onClick={() => navigate("/userprofile")}>
-             <FaUser />
-                  {user}
-            </button>
-          </li>
-        )}
-
-        {/* Login and Signup only when NOT logged in */}
-        {!user && (
-          <>
-            <li className='cursor-pointer p-3 hover:font-black'>
-              <Link to="/login">Login</Link>
-            </li>
-
-            <li className='cursor-pointer p-3 hover:font-black'>
-              <Link to="/signup">Signup</Link>
-            </li>
-          </>
-        )}
-
-        {/* Logout only when logged in */}
-        {user && (
-          <li className='cursor-pointer p-3 hover:font-black'>
-            <button  className='' onClick={logouthadeler}>
-              Logout
-            </button>
-          </li>
-        )}
-
-      </ul>
-
-    </nav>
-
-    </>
-  )
-}
-
-export default Navbar
